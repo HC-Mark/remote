@@ -172,8 +172,8 @@ exists (x:xs)
 exists_tests = "exists" ~:
                TestList [ "FF"  ~: exists [False, False]       ~?= False
                         , "TFT" ~: exists [False, True, False] ~?= True
-                        , "TTFT" ~: exits [True, True, False, True] ~?= True
-                        , "FFFFF" ~: exits [False, False, False, False, False] ~?= False ]
+                        , "TTFT" ~: exists [True, True, False, True] ~?= True
+                        , "FFFFF" ~: exists [False, False, False, False, False] ~?= False ]
 
 --------------------------------------------------------------------------------
 -- Problem 6 (join)
@@ -211,8 +211,8 @@ containsStr_tests
                containsStr ["truck", "barbie", "top"] "barbie" ~?= True
              , "woody" ~:
                containsStr ["truck", "barbie", "top"] "woody"  ~?= False
-             , "Zeus" ~: ["truck", "barbie", "top"] "Zeus" ~?= False
-             , "panda" ~: ["truck", "barbie", "top"] "panda" ~?= False ]
+             , "Zeus" ~:containsStr ["truck", "barbie", "top"] "Zeus" ~?= False
+             , "panda" ~: containsStr ["truck", "barbie", "top"] "panda" ~?= False ]
 
 {- Next, write a function that, given a list of toys and a list of
    dolls, filters the toys list so that only dolls remain. Your
@@ -235,8 +235,8 @@ dollsOf_tests
                  ~?= ["barbie"]
              , "none" ~:
                dollsOf [] ["barbie", "woody"] ~?= []
-             , "reverse" ~:  ["truck", "barbie", "top"] ["top", "barbie", "truck"] ~?= ["top", "barbie", "truck"]
-             , "empty" ~: [][] ~?= [] ]
+             , "reverse" ~: dollsOf ["truck", "barbie", "top"] ["top", "barbie", "truck"] ~?= ["top", "barbie", "truck"]
+             , "empty" ~:dollsOf [] [] ~?= [] ]
 
 --------------------------------------------------------------------------------
 -- Problem 8 (merging lists)
@@ -264,8 +264,8 @@ merge list1 list2
 merge_tests = "merge" ~:
               TestList [ "1 through 8" ~: merge [1,3,5,7] [2,4,6,8] ~?= [1..8]
                        , "empty list"  ~: merge [1,2,3]   []        ~?= [1,2,3]
-                       , "your test" ~: assertFailure "unwritten test"
-                       , "your test" ~: assertFailure "unwritten test" ]
+                       , "prime" ~: merge [2,3,5][11,13,15] ~?= [2,11,3,13,5,15]
+                       , "lazy" ~: merge[1,1,1,1] [0,0,0,0] ~?= [1,0,1,0,1,0,1,0] ]
 
 --------------------------------------------------------------------------------
 -- Problem 9 (is_sorted)
@@ -281,16 +281,16 @@ merge_tests = "merge" ~:
 isSorted :: [Int] -> Bool
 isSorted [] = True
 isSorted [x] = True
-isSorted list
-  | head list > head(tail list) = False
-  | (length list == 2) && (head list <= head(tail list)) = True
-  | head list <= head(tail list) = True || isSorted (tail list)
+isSorted list = head list <= head(tail list) && isSorted (tail list)
+  -- | head list > head(tail list) = False
+  -- | (length list == 2) && (head list <= head(tail list)) = True
+  -- | head list <= head(tail list) = isSorted (tail list) || True
 
 isSorted_tests = "isSorted" ~:
                  TestList [ "123" ~: isSorted [1,2,3] ~?= True
                           , "321" ~: isSorted [3,2,1] ~?= False
-                          , "your test" ~: assertFailure "unwritten test"
-                          , "your test" ~: assertFailure "unwritten test" ]
+                          , "159357" ~: isSorted [1,5,9,3,5,7] ~?= False
+                          , "13579" ~: isSorted [1,3,5,7,9] ~?= True ]
 
 --------------------------------------------------------------------------------
 -- Problem 10 (merge_sorted)
@@ -314,8 +314,8 @@ mergeSorted_tests
   = "mergeSorted" ~:
     TestList [ "primes"     ~: mergeSorted [2,7] [3,5,11] ~?= [2,3,5,7,11]
              , "sequential" ~: mergeSorted [1,2,3] [4,5,6] ~?= [1,2,3,4,5,6]
-             , "your test" ~: assertFailure "unwritten test"
-             , "your test" ~: assertFailure "unwritten test" ]
+             , "even" ~: mergeSorted [2,8,18,20] [4,10,16,30] ~?= [2,4,8,10,16,18,20,30]
+             , "odd" ~: mergeSorted [1,3,9,19] [5,7,15,21] ~?= [1,3,5,7,9,15,19,21] ]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -341,8 +341,8 @@ evensOnly list = filter even' list
 evensOnly_tests = "evensOnly" ~:
                   TestList [ "12345" ~: evensOnly [1,2,3,4,5] ~?= [2,4]
                            , "2468"  ~: evensOnly [2,4,6,8]   ~?= [2,4,6,8]
-                           , "your test" ~: assertFailure "unwritten test"
-                           , "your test" ~: assertFailure "unwritten test" ]
+                           , "10101010" ~: evensOnly [1,0,1,0,1,0,1,0] ~?= [0,0,0,0]
+                           , "prime" ~: evensOnly[2,3,5,7,9] ~?= [2] ]
 
 --------------------------------------------------------------------------------
 -- Problem 12 (squares)
@@ -356,8 +356,8 @@ squares list = zipWith (*) list list
 squares_tests = "squares" ~:
                 TestList [ "123"  ~: squares [1,2,3]    ~?= [1,4,9]
                          , "negs" ~: squares [-1,-2,-3] ~?= [1,4,9]
-                         , "your test" ~: assertFailure "unwritten test"
-                         , "your test" ~: assertFailure "unwritten test" ]
+                         , "prime" ~: squares [2,3,5] ~?= [4,9,25]
+                         , "large" ~: squares[180,444,246] ~?= [32400,197136,60516] ]
 
 --------------------------------------------------------------------------------
 -- Problem 13 (wurble)
@@ -375,8 +375,8 @@ wurble list = zipWith (*) (filter helper list) (filter helper list)
 wurble_tests = "wurble" ~:
                TestList [ "negs" ~: wurble [-1,-2,-3,-4,-5] ~?= [16]
                         , "neg6" ~: wurble [1,2,3,4,5,-6]   ~?= [36]
-                        , "your test" ~: assertFailure "unwritten test"
-                        , "your test" ~: assertFailure "unwritten test" ]
+                        , "double_neg" ~: wurble [1,2,3,-4,5,-6] ~?= [16,36]
+                        , "6_list" ~: wurble [6,16,-16,-36,-6] ~?= [256,1296,36]  ]
 
 --------------------------------------------------------------------------------
 -- Problem 14 (sums)
@@ -393,8 +393,8 @@ sums list1 list2
 sums_tests = "sums" ~:
              TestList [ "123,456" ~: sums [1,2,3] [4,5,6] ~?= [5,7,9]
                       , "1234,00" ~: sums [1,2,3,4] [0,0] ~?= [1,2]
-                      , "your test" ~: assertFailure "unwritten test"
-                      , "your test" ~: assertFailure "unwritten test" ]
+                      , "even,odd" ~: sums [2,4,6] [1,3,5] ~?= [3,7,11]
+                      , "power" ~: sums [2,4,8] [256,512,1024] ~?= [258, 516, 1032] ]
 
 --------------------------------------------------------------------------------
 -- Problem 15 (permutations)
@@ -464,18 +464,20 @@ all_tests = TestList [ coins_tests
                      , evensOnly_tests
                      , squares_tests
                      , wurble_tests
-                     , sums_tests
-                     , permutations_tests ]
+                     , sums_tests]
+                   --  , permutations_tests ]
 
 --------------------------------------------------------------------------------
 {- Now that you've finished the assignment, please answer the following
    questions:
 
 1. How did this assignment go for you?
-
+   It is very difficult for me and also overwhelming for me. Since I need to catch up the class for about a week, I am not very good at the syntax. So I spent more than 10 hours on it.
 2. What questions do you have?
-
+   1.can we use recursion in a list comprehension?
+   2. what is the different between (x:xs) and head & tail of a list
+   3. why anonoymous function does not work on my program...
 3. How long did this assignment take?
-
+   10 hours.
 -}
 
