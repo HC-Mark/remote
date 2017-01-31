@@ -1,0 +1,35 @@
+-- Problem 1 (counting coins)
+
+{- Your job in this problem is to calculate the smallest number of
+   pennies, nickels, and dimes that can be used to add up to the given
+   amount. For example, to make 7 cents, a total of 3 coins are
+   needed (two pennies and a nickel); to make 99 cents, 14 coins are
+   needed (9 dimes, 1 nickel, and 4 pennies). Fill in the body of the
+   function 'coins' below so that it returns the right answer. Prefer
+   guards over `if`/`then`/`else`. -}
+
+coins :: Int -> Int
+coins = error "coins: unimplemented"
+coins total =
+      sum [d | if total >=10 then d <- 1, coins (total- 10)
+               else if total == 0,then d <-0
+               else if total == 1,then d <-1
+               else if total == 2,then d <-2
+               else if total == 3,then d <-3
+               else if total == 4,then d <-4
+               else if total == 5,then d <-1
+               else if total == 6,then d <-2
+               else if total == 7,then d <-3
+               else if total == 8,then d <-4
+               else if total == 9,then d <-5]     
+
+-- I provide two test cases. You must provide two more.
+-- See https://hackage.haskell.org/package/HUnit-1.5.0.0/docs/Test-HUnit-Base.html
+-- for the functions to create tests. (For now, treat Assertion and Test as
+-- interchangeable.)
+
+coins_tests = "coins" ~:
+              TestList [ "coins 7"  ~: coins 7  ~?= 3
+                       , "coins 99" ~: coins 99 ~?= 14
+                       , "your test" ~: assertFailure "unwritten test"
+                       , "your test" ~: assertFailure "unwritten test" ]
